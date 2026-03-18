@@ -1,4 +1,4 @@
-# ⭐ GA4 Conversion Funnel Analysis & A/B Test Simulation
+# GA4 Conversion Funnel Analysis & A/B Test Simulation
 
 `Google BigQuery` | `dbt` | `SQL` |`Python`| `Jupyter Notebook`| `Google Cloud Platform` | `Git`
 
@@ -15,6 +15,11 @@
 <h1 id="key-results"> ⭐ Key Results</h1>
 
 <h1 id="dataset">🛠️ Dataset</h1>
+
+- This dataset contains anonymised event-level data from the Google Merchandise Store, collected using Google Analytics 4 (GA4). It simulates a real-world ecommerce tracking implementation, including user interactions, sessions, and purchase behaviour.
+- **Source:** [Google BigQuery Public Dataset](https://developers.google.com/analytics/bigquery/web-ecommerce-demo-dataset)  
+- **Name:** `ga4_obfuscated_sample_ecommerce`
+- **Time Range:** 1 Nov 2020 – 31 Jan 2021
 
 <h1 id="contact"> 📞Contact</h1>
 
