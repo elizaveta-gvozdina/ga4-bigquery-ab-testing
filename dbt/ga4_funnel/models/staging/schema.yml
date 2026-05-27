@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: stg_ga4__events
+    description: "Flattened GA4 events: one row per event, nested fields extracted"
+    columns:
+      - name: user_pseudo_id
+        description: "Anonymous user identifier from GA4"
+        tests:
+          - not_null
+      - name: session_id
+        description: "GA4 session ID (ga_session_id event param)"
+      - name: event_name
+        description: "Name of the GA4 event"
+        tests:
+          - not_null
+      - name: event_timestamp
+        description: "Event timestamp converted from microseconds to TIMESTAMP"
+        tests:
+          - not_null
