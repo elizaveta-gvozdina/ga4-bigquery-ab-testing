@@ -1,0 +1,2 @@
+ctrl_sessions,ctrl_conversions,ctrl_conversion_rate_pct,ctrl_revenue_usd,ctrl_aov_usd,test_sessions,test_conversions,test_conversion_rate_pct,test_revenue_usd,test_aov_usd,absolute_lift_pct,relative_lift_pct,z_score,is_significant_90,is_significant_95,is_significant_99
+180227,2458,1.3638,160024.0,65.1,179902,2390,1.3285,158766.0,66.43,-0.0353,-2.59,-0.92,false,false,false

@@ -1,0 +1,68 @@
+unit_tests:
+
+  - name: test_funnel_purchase_sets_flag
+    description: >
+      Scenario: Session with a purchase event
+        Given events including a purchase with revenue
+        When int_user_funnel aggregates by session
+        Then reached_purchase = 1 and revenue_usd is populated
+    model: int_user_funnel
+    given:
+      - input: ref('stg_ga4__events')
+        rows:
+          - {user_pseudo_id: "user_A", session_id: 100, event_name: "session_start", revenue_usd: null, transaction_id: null}
+          - {user_pseudo_id: "user_A", session_id: 100, event_name: "view_item",     revenue_usd: null, transaction_id: null}
+          - {user_pseudo_id: "user_A", session_id: 100, event_name: "add_to_cart",   revenue_usd: null, transaction_id: null}
+          - {user_pseudo_id: "user_A", session_id: 100, event_name: "begin_checkout", revenue_usd: null, transaction_id: null}
+          - {user_pseudo_id: "user_A", session_id: 100, event_name: "purchase",      revenue_usd: 42.50, transaction_id: "TXN001"}
+    expect:
+      rows:
+        - {user_pseudo_id: "user_A", session_id: 100, reached_session_start: 1, reached_view_item: 1, reached_add_to_cart: 1, reached_begin_checkout: 1, reached_purchase: 1, revenue_usd: 42.50, transaction_id: "TXN001"}
+
+  - name: test_funnel_browse_only_session
+    description: >
+      Scenario: Session with only browsing (no cart/checkout/purchase)
+        Given a session with session_start and view_item only
+        When int_user_funnel aggregates
+        Then cart/checkout/purchase flags are 0, revenue is null
+    model: int_user_funnel
+    given:
+      - input: ref('stg_ga4__events')
+        rows:
+          - {user_pseudo_id: "user_B", session_id: 200, event_name: "session_start", revenue_usd: null, transaction_id: null}
+          - {user_pseudo_id: "user_B", session_id: 200, event_name: "view_item",     revenue_usd: null, transaction_id: null}
+    expect:
+      rows:
+        - {user_pseudo_id: "user_B", session_id: 200, reached_session_start: 1, reached_view_item: 1, reached_add_to_cart: 0, reached_begin_checkout: 0, reached_purchase: 0, revenue_usd: null, transaction_id: null}
+
+  - name: test_funnel_no_funnel_events
+    description: >
+      Scenario: Session with only page_view events (no funnel events)
+        Given a session with only page_view
+        When int_user_funnel aggregates
+        Then all funnel flags are 0
+    model: int_user_funnel
+    given:
+      - input: ref('stg_ga4__events')
+        rows:
+          - {user_pseudo_id: "user_C", session_id: 300, event_name: "page_view", revenue_usd: null, transaction_id: null}
+    expect:
+      rows:
+        - {user_pseudo_id: "user_C", session_id: 300, reached_session_start: 0, reached_view_item: 0, reached_add_to_cart: 0, reached_begin_checkout: 0, reached_purchase: 0, revenue_usd: null, transaction_id: null}
+
+  - name: test_aa_group_assignment_is_deterministic
+    description: >
+      Scenario: Known user_pseudo_id maps to a known group
+        Given a specific user_pseudo_id
+        When FARM_FINGERPRINT mod 2 is applied
+        Then the user is assigned to a predictable group
+    model: int_aa_test_groups
+    given:
+      - input: ref('stg_ga4__events')
+        rows:
+          - {user_pseudo_id: "test_user_abc"}
+          - {user_pseudo_id: "test_user_xyz"}
+    expect:
+      rows:
+        - {user_pseudo_id: "test_user_abc", aa_group: "control"}
+        - {user_pseudo_id: "test_user_xyz", aa_group: "treatment"}

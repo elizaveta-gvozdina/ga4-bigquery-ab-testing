@@ -1,0 +1,115 @@
+version: 2
+
+models:
+  - name: int_sessions
+    description: >
+      Session-level aggregation of GA4 events.
+      One row per (user_pseudo_id, session_id).
+      Contains session duration, pageviews, engagement flag,
+      and first observed traffic source / device / geo attributes.
+    columns:
+      - name: user_pseudo_id
+        description: "Anonymous user identifier"
+        data_tests:
+          - not_null
+
+      - name: session_id
+        description: "GA4 session identifier (ga_session_id)"
+        data_tests:
+          - not_null
+
+      - name: session_start_at
+        description: "Timestamp of the earliest event in this session"
+
+      - name: session_end_at
+        description: "Timestamp of the latest event in this session"
+
+      - name: session_duration_seconds
+        description: "Elapsed seconds between first and last event. Zero for single-event sessions"
+
+      - name: pageviews
+        description: "Count of page_view events in this session"
+
+      - name: is_engaged
+        description: "1 if GA4 flagged the session as engaged, 0 otherwise"
+
+      - name: traffic_source
+        description: "Traffic source for this session (first non-null value)"
+
+      - name: traffic_medium
+        description: "Traffic medium for this session"
+
+      - name: traffic_campaign
+        description: "Campaign name for this session"
+
+      - name: device_category
+        description: "Device category: desktop, mobile, or tablet"
+
+      - name: operating_system
+        description: "Operating system of the user's device"
+
+      - name: browser
+        description: "Browser used in this session"
+
+      - name: country
+        description: "User country from IP geolocation"
+
+      - name: city
+        description: "User city from IP geolocation"
+
+  - name: int_user_funnel
+    description: >
+      Ecommerce funnel flags per session.
+      One row per (user_pseudo_id, session_id).
+      Binary flags indicate whether each funnel step was reached:
+      session_start → view_item → add_to_cart → begin_checkout → purchase.
+    columns:
+      - name: user_pseudo_id
+        description: "Anonymous user identifier"
+        data_tests:
+          - not_null
+
+      - name: session_id
+        description: "GA4 session identifier"
+        data_tests:
+          - not_null
+
+      - name: reached_session_start
+        description: "1 if session_start event occurred in this session"
+
+      - name: reached_view_item
+        description: "1 if user viewed a product item"
+
+      - name: reached_add_to_cart
+        description: "1 if user added an item to cart"
+
+      - name: reached_begin_checkout
+        description: "1 if user began checkout flow"
+
+      - name: reached_purchase
+        description: "1 if a purchase event was recorded"
+
+      - name: revenue_usd
+        description: "Purchase revenue in USD. Null when no purchase occurred"
+
+      - name: transaction_id
+        description: "Transaction ID from the purchase event. Null when no purchase occurred"
+
+  - name: int_aa_test_groups
+    description: >
+      Deterministic A/A test group assignment.
+      One row per user_pseudo_id.
+      Uses FARM_FINGERPRINT for repeatable hashing — same user always maps to same group.
+    columns:
+      - name: user_pseudo_id
+        description: "Anonymous user identifier — primary key"
+        data_tests:
+          - unique
+          - not_null
+
+      - name: aa_group
+        description: "'control' or 'treatment', assigned via FARM_FINGERPRINT mod 2"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['control', 'treatment']

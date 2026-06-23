@@ -1,0 +1,108 @@
+version: 2
+
+models:
+  - name: mart_funnel_metrics
+    description: >
+      Ecommerce conversion funnel metrics aggregated by A/A test group.
+      One row per (aa_group, device_category).
+      Step-over-step conversion rates, end-to-end conversion rate,
+      revenue totals, and average order value.
+      Joined with int_sessions for device breakdowns.
+    columns:
+      - name: aa_group
+        description: "A/A test group: 'control' or 'treatment'"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['control', 'treatment']
+
+      - name: device_category
+        description: "Device type: desktop, mobile, or tablet"
+
+      - name: total_sessions
+        description: "Total number of sessions in this group"
+
+      - name: n_session_start
+        description: "Sessions with a session_start event"
+
+      - name: n_view_item
+        description: "Sessions where at least one item was viewed"
+
+      - name: n_add_to_cart
+        description: "Sessions where at least one item was added to cart"
+
+      - name: n_begin_checkout
+        description: "Sessions where checkout was initiated"
+
+      - name: n_purchase
+        description: "Sessions with a completed purchase"
+
+      - name: total_revenue_usd
+        description: "Sum of purchase revenue in USD for this group"
+
+      - name: overall_conversion_rate_pct
+        description: "End-to-end conversion: sessions that led to purchase / total sessions, in percent"
+
+      - name: avg_order_value_usd
+        description: "Average revenue per purchase transaction"
+
+      - name: revenue_per_session_usd
+        description: "Total revenue divided by total sessions — monetization efficiency metric"
+
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "n_purchase <= n_begin_checkout"
+          config:
+            severity: warn
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "n_begin_checkout <= n_add_to_cart"
+          config:
+            severity: warn
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "overall_conversion_rate_pct >= 0"
+
+  - name: mart_aa_test_results
+    description: >
+      Statistical comparison of A/A test groups on the primary metric (purchase conversion rate).
+      Single row with control vs treatment stats, absolute/relative lift,
+      z-score from two-proportion z-test, p-value via ERFC, and significance flags at 90/95/99% levels.
+    columns:
+      - name: ctrl_sessions
+        description: "Number of sessions in the control group"
+
+      - name: ctrl_conversions
+        description: "Number of purchase conversions in control"
+
+      - name: ctrl_conversion_rate_pct
+        description: "Control purchase conversion rate in percent"
+
+      - name: test_sessions
+        description: "Number of sessions in the treatment group"
+
+      - name: test_conversions
+        description: "Number of purchase conversions in treatment"
+
+      - name: test_conversion_rate_pct
+        description: "Treatment purchase conversion rate in percent"
+
+      - name: absolute_lift_pct
+        description: "Treatment rate minus control rate, in percentage points"
+
+      - name: relative_lift_pct
+        description: "Percent change of treatment rate relative to control rate"
+
+      - name: z_score
+        description: "Z-statistic from two-proportion z-test"
+
+      - name: is_significant_90
+        description: "True if |z| > 1.645 (90% confidence)"
+
+      - name: is_significant_95
+        description: "True if |z| > 1.960 (95% confidence)"
+
+      - name: is_significant_99
+        description: "True if |z| > 2.576 (99% confidence)"

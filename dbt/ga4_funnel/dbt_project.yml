@@ -32,7 +32,7 @@ clean-targets:         # directories to be removed by `dbt clean`
 models:
   ga4_funnel:
     staging:
-      +materialized: view
+      +materialized: table
       +schema: staging
     intermediate:
       +materialized: table
@@ -40,5 +40,3 @@ models:
     marts:
       +materialized: table
       +schema: marts
-    example:
-      +materialized: view

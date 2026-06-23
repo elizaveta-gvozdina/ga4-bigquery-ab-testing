@@ -2,19 +2,77 @@ version: 2
 
 models:
   - name: stg_ga4__events
-    description: "Flattened GA4 events: one row per event, nested fields extracted"
+    description: >
+      Flattened GA4 event data from Google Merchandise Store.
+      One row per event. Nested event_params extracted into typed columns,
+      ecommerce/device/geo structs unpacked.
+      Filtered to Nov 2020 – Jan 2021.
     columns:
       - name: user_pseudo_id
-        description: "Anonymous user identifier from GA4"
-        tests:
+        description: "Anonymous client-side user identifier set by GA4 SDK"
+        data_tests:
           - not_null
-      - name: session_id
-        description: "GA4 session ID (ga_session_id event param)"
+
       - name: event_name
-        description: "Name of the GA4 event"
-        tests:
+        description: "GA4 event name (e.g. session_start, page_view, purchase)"
+        data_tests:
           - not_null
+
       - name: event_timestamp
-        description: "Event timestamp converted from microseconds to TIMESTAMP"
-        tests:
+        description: "Event timestamp converted from microseconds via timestamp_micros()"
+        data_tests:
           - not_null
+
+      - name: session_id
+        description: "ga_session_id from event_params. Null for events fired outside a session context"
+
+      - name: session_number
+        description: "Ordinal session count for this user (ga_session_number)"
+
+      - name: page_location
+        description: "Full URL of the page where the event fired"
+
+      - name: page_title
+        description: "HTML title of the page at event time"
+
+      - name: engagement_time_msec
+        description: "Cumulative foreground engagement time in milliseconds for this event"
+
+      - name: session_engaged
+        description: "Flag from GA4: '1' if the session had >10s engagement, a conversion, or 2+ page views"
+
+      - name: transaction_id
+        description: "Ecommerce transaction ID. Non-null only for purchase events"
+
+      - name: revenue_usd
+        description: "Purchase revenue in USD from ecommerce.purchase_revenue_in_usd"
+
+      - name: traffic_source
+        description: "First-touch traffic source (e.g. google, (direct)). Set once per user, not per session"
+
+      - name: traffic_medium
+        description: "First-touch traffic medium (e.g. organic, cpc, referral)"
+
+      - name: traffic_campaign
+        description: "First-touch campaign name from traffic_source.name"
+
+      - name: device_category
+        description: "Device form factor: desktop, mobile, or tablet"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['desktop', 'mobile', 'tablet']
+              config:
+                severity: warn
+
+      - name: operating_system
+        description: "OS reported by the user agent (e.g. Windows, Macintosh, Android, iOS)"
+
+      - name: browser
+        description: "Browser name from user agent (e.g. Chrome, Safari, Firefox)"
+
+      - name: country
+        description: "User country derived from IP geolocation"
+
+      - name: city
+        description: "User city derived from IP geolocation. May be '(not set)' when unavailable"
