@@ -33,7 +33,7 @@ Out of **360,129 sessions**, only **4,848 resulted in a purchase** — an overal
 ## Objective
 
 ### 1. Funnel Analysis
-Identify the biggest drop-off points in the ecommerce conversion funnel:
+Identify conversion bottlenecks across the purchase funnel and understand user behaviour patterns to support data-driven decisions for improving purchase conversion rate (currently 1.35%).
 
 `session_start` &rarr; `view_item` &rarr; `add_to_cart` &rarr; `begin_checkout` &rarr; `purchase`
 
