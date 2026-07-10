@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# dbt
+dbt/ga4_funnel/target/
+dbt/ga4_funnel/dbt_packages/
+dbt/ga4_funnel/logs/
+
+# Google Cloud — never commit credentials
+*.json
+service_account*.json
+gcloud_credentials*.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp

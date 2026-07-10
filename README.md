@@ -2,6 +2,8 @@
 
 `Google BigQuery` | `dbt` | `SQL` | `Python` | `Jupyter Notebook` | `Google Cloud Platform` | `Git` | `Claude Code`
 
+> 🚧 **Status:** Work in progress
+
 ---
 
 ## Table of Contents
@@ -74,6 +76,9 @@ ga4-bigquery-ab-testing/
 ├── LICENSE
 ├── docs/
 │   └── dag.md                          # Mermaid DAG diagram
+├── notebooks/
+│   ├── eda.ipynb                       # Exploratory data analysis (WIP)
+│   └── requirements.txt               # Python dependencies
 └── dbt/
     └── ga4_funnel/
         ├── dbt_project.yml
